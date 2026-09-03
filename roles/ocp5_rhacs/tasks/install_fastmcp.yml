@@ -7,7 +7,7 @@
 - name: Install pip and FastMCP CLI on bastion
   ansible.builtin.shell: |
     dnf install -y pip
-    pip3 install fastmcp=={{ ocp5_ea_fastmcp_version }}
+    pip3 install fastmcp=={{ ocp5_rhacs_fastmcp_version }}
   delegate_to: "{{ r_bastion_host }}"
   become: true
   register: r_fastmcp_install

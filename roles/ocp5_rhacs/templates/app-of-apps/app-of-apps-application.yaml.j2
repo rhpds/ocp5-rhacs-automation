@@ -25,25 +25,25 @@ spec:
       - CreateNamespace=true
       - RespectIgnoreDifferences=true
   source:
-    repoURL: {{ ocp5_ea_gitops_repo }}
-    targetRevision: {{ ocp5_ea_gitops_repo_tag }}
+    repoURL: {{ ocp5_rhacs_gitops_repo }}
+    targetRevision: {{ ocp5_rhacs_gitops_repo_tag }}
     path: app-of-apps
     helm:
       valuesObject:
         gitops:
-          repoURL: {{ ocp5_ea_gitops_repo }}
-          targetRevision: {{ ocp5_ea_gitops_repo_tag }}
+          repoURL: {{ ocp5_rhacs_gitops_repo }}
+          targetRevision: {{ ocp5_rhacs_gitops_repo_tag }}
 
         argocd:
           namespace: openshift-gitops
 
         # Placeholder for future operator version pinning via frozen OLM catalog snapshot
         catalogSource:
-          enabled: {{ ocp5_ea_catalog_source_enabled }}
-          name: {{ ocp5_ea_catalog_source_name }}
-          namespace: {{ ocp5_ea_catalog_source_namespace }}
-          image: {{ ocp5_ea_catalog_source_image }}
-          tag: {{ ocp5_ea_catalog_source_tag }}
+          enabled: {{ ocp5_rhacs_catalog_source_enabled }}
+          name: {{ ocp5_rhacs_catalog_source_name }}
+          namespace: {{ ocp5_rhacs_catalog_source_namespace }}
+          image: {{ ocp5_rhacs_catalog_source_image }}
+          tag: {{ ocp5_rhacs_catalog_source_tag }}
 
         cluster:
           subdomain: {{ r_openshift_subdomain }}
@@ -54,10 +54,10 @@ spec:
 
         acs:
           enabled: true
-          name: {{ ocp5_ea_acs_application_name }}
-          namespace: {{ ocp5_ea_acs_namespace }}
-          clusterName: {{ ocp5_ea_acs_clustername }}
-          adminPassword: {{ ocp5_ea_acs_adminpassword }}
+          name: {{ ocp5_rhacs_acs_application_name }}
+          namespace: {{ ocp5_rhacs_acs_namespace }}
+          clusterName: {{ ocp5_rhacs_acs_clustername }}
+          adminPassword: {{ ocp5_rhacs_acs_adminpassword }}
 
         # Custom console build — disabled since EC6 includes the layout fix
         consoleBuild:
@@ -75,7 +75,7 @@ spec:
           name: openshift-agentic-lightspeed
           namespace: openshift-lightspeed
           llm:
-            apiUrl: "{{ ocp5_ea_llm_api_url }}"
-            apiKey: "{{ ocp5_ea_llm_api_key }}"
-            provider: "{{ ocp5_ea_llm_api_provider }}"
-            model: "{{ ocp5_ea_llm_api_model }}"
+            apiUrl: "{{ ocp5_rhacs_llm_api_url }}"
+            apiKey: "{{ ocp5_rhacs_llm_api_key }}"
+            provider: "{{ ocp5_rhacs_llm_api_provider }}"
+            model: "{{ ocp5_rhacs_llm_api_model }}"

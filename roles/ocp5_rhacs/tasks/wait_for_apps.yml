@@ -52,7 +52,7 @@
       | rejectattr('status.health.status', 'equalto', 'Healthy')
       | list
       | length == 0
-  ignore_errors: "{{ ocp5_ea_wait_for_apps_ignore_errors }}"
+  ignore_errors: "{{ ocp5_rhacs_wait_for_apps_ignore_errors }}"
 
 - name: Report unhealthy Applications
   when: r_argocd_apps_status is failed

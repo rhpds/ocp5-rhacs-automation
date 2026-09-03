@@ -10,8 +10,8 @@
   kubernetes.core.k8s_info:
     api_version: v1
     kind: Secret
-    name: "{{ ocp5_ea_console_cert_source_secret }}"
-    namespace: "{{ ocp5_ea_console_cert_source_namespace }}"
+    name: "{{ ocp5_rhacs_console_cert_source_secret }}"
+    namespace: "{{ ocp5_rhacs_console_cert_source_namespace }}"
   register: r_ingress_cert
   retries: 10
   delay: 10
@@ -26,7 +26,7 @@
       apiVersion: v1
       kind: Secret
       metadata:
-        name: "{{ ocp5_ea_console_cert_target_secret }}"
+        name: "{{ ocp5_rhacs_console_cert_target_secret }}"
         namespace: openshift-config
       type: kubernetes.io/tls
       data:
@@ -54,4 +54,4 @@
             namespace: openshift-console
             hostname: "{{ r_console_route_cert.resources[0].spec.host }}"
             servingCertKeyPairSecret:
-              name: "{{ ocp5_ea_console_cert_target_secret }}"
+              name: "{{ ocp5_rhacs_console_cert_target_secret }}"

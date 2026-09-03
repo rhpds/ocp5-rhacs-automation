@@ -40,11 +40,11 @@
     r_openshift_api_server: "{{ r_api_url.resources[0].status.apiServerURL }}"
 
 - name: Apply OCP 5.0 console cert workaround
-  when: ocp5_ea_console_cert_workaround | bool
+  when: ocp5_rhacs_console_cert_workaround | bool
   ansible.builtin.include_tasks: console_cert_workaround.yml
 
 - name: Install OpenShift Gitops
-  when: ocp5_ea_openshift_gitops_install | bool
+  when: ocp5_rhacs_openshift_gitops_install | bool
   ansible.builtin.include_tasks: openshift_gitops.yml
 
 - name: Retrieve openshift-gitops-cluster secret
@@ -78,18 +78,18 @@
       openshift_gitops_password: "{{ openshift_gitops_admin_password }}"
 
 - name: Merge ACS nightly pull secret into global pull secret
-  when: ocp5_ea_acs_pull_secret | default('') | length > 0
+  when: ocp5_rhacs_acs_pull_secret | default('') | length > 0
   ansible.builtin.include_tasks: merge_global_pull_secret.yml
 
 - name: Deploy app-of-apps
   ansible.builtin.include_tasks: app_of_apps.yml
 
 - name: Install oc-agentic CLI plugin on bastion
-  when: ocp5_ea_install_oc_agentic | bool
+  when: ocp5_rhacs_install_oc_agentic | bool
   ansible.builtin.include_tasks: install_oc_agentic.yml
 
 - name: Install FastMCP CLI on bastion
-  when: ocp5_ea_install_fastmcp | bool
+  when: ocp5_rhacs_install_fastmcp | bool
   ansible.builtin.include_tasks: install_fastmcp.yml
 
 - name: Install Showroom

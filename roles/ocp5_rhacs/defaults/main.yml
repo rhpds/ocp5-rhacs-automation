@@ -3,60 +3,60 @@
 # App-of-apps GitOps source
 # ------------------------------------------------
 
-ocp5_ea_wait_for_apps_ignore_errors: false
+ocp5_rhacs_wait_for_apps_ignore_errors: false
 
-ocp5_ea_gitops_repo: https://github.com/rhpds/ocp5-ea-gitops.git
-ocp5_ea_gitops_repo_tag: main
+ocp5_rhacs_gitops_repo: https://github.com/rhpds/ocp5-ea-gitops.git
+ocp5_rhacs_gitops_repo_tag: main
 
 # ------------------------------------------------
 # OpenShift GitOps
 # ------------------------------------------------
 
-ocp5_ea_openshift_gitops_install: true
+ocp5_rhacs_openshift_gitops_install: true
 
-ocp5_ea_openshift_gitops_operator_channel: latest
-ocp5_ea_openshift_gitops_operator_automatic_install_plan_approval: true
-ocp5_ea_openshift_gitops_operator_starting_csv: ""
-ocp5_ea_openshift_gitops_operator_name: openshift-gitops-operator
-ocp5_ea_openshift_gitops_operator_namespace: openshift-operators
+ocp5_rhacs_openshift_gitops_operator_channel: latest
+ocp5_rhacs_openshift_gitops_operator_automatic_install_plan_approval: true
+ocp5_rhacs_openshift_gitops_operator_starting_csv: ""
+ocp5_rhacs_openshift_gitops_operator_name: openshift-gitops-operator
+ocp5_rhacs_openshift_gitops_operator_namespace: openshift-operators
 # Catalog source pinning for GitOps operator — placeholder for future pinning
-ocp5_ea_openshift_gitops_operator_catalog: redhat-operators-v422
-ocp5_ea_openshift_gitops_operator_use_catalog_snapshot: true
-ocp5_ea_openshift_gitops_operator_catalogsource_name: redhat-operators-v422
-ocp5_ea_openshift_gitops_operator_catalogsource_namespace: openshift-marketplace
-ocp5_ea_openshift_gitops_operator_catalog_snapshot_image: quay.io/rhpds/olm_snapshot_redhat_catalog
-ocp5_ea_openshift_gitops_operator_catalog_snapshot_image_tag: v4.22_2026_08_03
+ocp5_rhacs_openshift_gitops_operator_catalog: redhat-operators-v422
+ocp5_rhacs_openshift_gitops_operator_use_catalog_snapshot: true
+ocp5_rhacs_openshift_gitops_operator_catalogsource_name: redhat-operators-v422
+ocp5_rhacs_openshift_gitops_operator_catalogsource_namespace: openshift-marketplace
+ocp5_rhacs_openshift_gitops_operator_catalog_snapshot_image: quay.io/rhpds/olm_snapshot_redhat_catalog
+ocp5_rhacs_openshift_gitops_operator_catalog_snapshot_image_tag: v4.22_2026_08_03
 
-ocp5_ea_openshift_gitops_operator_config:
+ocp5_rhacs_openshift_gitops_operator_config:
   env:
     - name: ARGOCD_CLUSTER_CONFIG_NAMESPACES
       value: 'openshift-gitops'
 
-ocp5_ea_openshift_gitops_setup_cluster_admin: true
+ocp5_rhacs_openshift_gitops_setup_cluster_admin: true
 
-ocp5_ea_openshift_gitops_enable_route: true
-ocp5_ea_openshift_gitops_update_route_tls: true
+ocp5_rhacs_openshift_gitops_enable_route: true
+ocp5_rhacs_openshift_gitops_update_route_tls: true
 
-ocp5_ea_openshift_gitops_update_resources: true
+ocp5_rhacs_openshift_gitops_update_resources: true
 
 # Application Controller
-ocp5_ea_openshift_gitops_controller_update: true
-ocp5_ea_openshift_gitops_controller_requests_cpu: 512m
-ocp5_ea_openshift_gitops_controller_requests_memory: 1Gi
-ocp5_ea_openshift_gitops_controller_limits_cpu: "4"
-ocp5_ea_openshift_gitops_controller_limits_memory: 4Gi
-ocp5_ea_openshift_gitops_controller_app_sync: 3m
+ocp5_rhacs_openshift_gitops_controller_update: true
+ocp5_rhacs_openshift_gitops_controller_requests_cpu: 512m
+ocp5_rhacs_openshift_gitops_controller_requests_memory: 1Gi
+ocp5_rhacs_openshift_gitops_controller_limits_cpu: "4"
+ocp5_rhacs_openshift_gitops_controller_limits_memory: 4Gi
+ocp5_rhacs_openshift_gitops_controller_app_sync: 3m
 
-ocp5_ea_openshift_gitops_controller_remove_memory_limits: false
+ocp5_rhacs_openshift_gitops_controller_remove_memory_limits: false
 
 # Repo Server
-ocp5_ea_openshift_gitops_repo_update: true
-ocp5_ea_openshift_gitops_repo_requests_cpu: 500m
-ocp5_ea_openshift_gitops_repo_requests_memory: 512Mi
-ocp5_ea_openshift_gitops_repo_limits_cpu: "2"
-ocp5_ea_openshift_gitops_repo_limits_memory: 2Gi
+ocp5_rhacs_openshift_gitops_repo_update: true
+ocp5_rhacs_openshift_gitops_repo_requests_cpu: 500m
+ocp5_rhacs_openshift_gitops_repo_requests_memory: 512Mi
+ocp5_rhacs_openshift_gitops_repo_limits_cpu: "2"
+ocp5_rhacs_openshift_gitops_repo_limits_memory: 2Gi
 
-ocp5_ea_openshift_gitops_resource_customizations: |
+ocp5_rhacs_openshift_gitops_resource_customizations: |
   operators.coreos.com/Subscription:
     health.lua: |
       health_status = {}
@@ -94,7 +94,7 @@ ocp5_ea_openshift_gitops_resource_customizations: |
       health_status.message = "An install plan for a subscription is pending installation"
       return health_status
 
-ocp5_ea_openshift_gitops_ignore_differences: {}
+ocp5_rhacs_openshift_gitops_ignore_differences: {}
 
 # ------------------------------------------------
 # Operator catalog source pinning (Helm app-of-apps)
@@ -103,11 +103,11 @@ ocp5_ea_openshift_gitops_ignore_differences: {}
 # subscriptions use it instead of the live redhat-operators catalog.
 # ------------------------------------------------
 
-ocp5_ea_catalog_source_enabled: true
-ocp5_ea_catalog_source_name: redhat-operators-v422
-ocp5_ea_catalog_source_namespace: openshift-marketplace
-ocp5_ea_catalog_source_image: quay.io/rhpds/olm_snapshot_redhat_catalog
-ocp5_ea_catalog_source_tag: v4.22_2026_08_03
+ocp5_rhacs_catalog_source_enabled: true
+ocp5_rhacs_catalog_source_name: redhat-operators-v422
+ocp5_rhacs_catalog_source_namespace: openshift-marketplace
+ocp5_rhacs_catalog_source_image: quay.io/rhpds/olm_snapshot_redhat_catalog
+ocp5_rhacs_catalog_source_tag: v4.22_2026_08_03
 
 # ------------------------------------------------
 # Red Hat Advanced Cluster Security
@@ -116,40 +116,40 @@ ocp5_ea_catalog_source_tag: v4.22_2026_08_03
 # ------------------------------------------------
 # OCP 5.0 console cert workaround
 # ------------------------------------------------
-ocp5_ea_console_cert_workaround: true
-ocp5_ea_console_cert_source_secret: cert-manager-ingress-cert
-ocp5_ea_console_cert_source_namespace: openshift-ingress
-ocp5_ea_console_cert_target_secret: console-serving-cert
+ocp5_rhacs_console_cert_workaround: true
+ocp5_rhacs_console_cert_source_secret: cert-manager-ingress-cert
+ocp5_rhacs_console_cert_source_namespace: openshift-ingress
+ocp5_rhacs_console_cert_target_secret: console-serving-cert
 
 # ------------------------------------------------
 # Red Hat Advanced Cluster Security
 # ------------------------------------------------
 
-ocp5_ea_acs_application_name: acs
-ocp5_ea_acs_namespace: acs
-ocp5_ea_acs_clustername: local-cluster
-ocp5_ea_acs_adminpassword: "{{ common_password }}"
+ocp5_rhacs_acs_application_name: acs
+ocp5_rhacs_acs_namespace: acs
+ocp5_rhacs_acs_clustername: local-cluster
+ocp5_rhacs_acs_adminpassword: "{{ common_password }}"
 
 # ------------------------------------------------
 # LLM Configuration
 # ------------------------------------------------
-ocp5_ea_llm_api_url: "https://ols-lightspeed-apim-pilot.azure-api.net/ols-test-openai"
-ocp5_ea_llm_api_key: ""
-ocp5_ea_llm_api_model: "gpt-5.4"
-ocp5_ea_llm_api_provider: "openai"
+ocp5_rhacs_llm_api_url: "https://ols-lightspeed-apim-pilot.azure-api.net/ols-test-openai"
+ocp5_rhacs_llm_api_key: ""
+ocp5_rhacs_llm_api_model: "gpt-5.4"
+ocp5_rhacs_llm_api_provider: "openai"
 
 # ------------------------------------------------
 # ACS Nightly Pull Secret
 # ------------------------------------------------
-ocp5_ea_acs_pull_secret: ""
+ocp5_rhacs_acs_pull_secret: ""
 
 # ------------------------------------------------
 # oc-agentic CLI plugin
 # ------------------------------------------------
-ocp5_ea_install_oc_agentic: true
+ocp5_rhacs_install_oc_agentic: true
 
 # ------------------------------------------------
 # FastMCP CLI (MCP Gateway exercises)
 # ------------------------------------------------
-ocp5_ea_install_fastmcp: true
-ocp5_ea_fastmcp_version: "3.4.7"
+ocp5_rhacs_install_fastmcp: true
+ocp5_rhacs_fastmcp_version: "3.4.7"
