@@ -5,7 +5,7 @@
 
 ocp5_rhacs_wait_for_apps_ignore_errors: false
 
-ocp5_rhacs_gitops_repo: https://github.com/rhpds/ocp5-ea-gitops.git
+ocp5_rhacs_gitops_repo: https://github.com/rhpds/ocp5-rhacs-gitops.git
 ocp5_rhacs_gitops_repo_tag: main
 
 # ------------------------------------------------
