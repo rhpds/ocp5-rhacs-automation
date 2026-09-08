@@ -45,7 +45,9 @@ ocp5_rhacs_openshift_gitops_controller_requests_cpu: 512m
 ocp5_rhacs_openshift_gitops_controller_requests_memory: 1Gi
 ocp5_rhacs_openshift_gitops_controller_limits_cpu: "4"
 ocp5_rhacs_openshift_gitops_controller_limits_memory: 4Gi
-ocp5_rhacs_openshift_gitops_controller_app_sync: 3m
+ocp5_rhacs_openshift_gitops_controller_app_sync: 30s
+# How often Argo CD fetches git (upstream default is 3m).
+ocp5_rhacs_openshift_gitops_timeout_reconciliation: 30s
 
 ocp5_rhacs_openshift_gitops_controller_remove_memory_limits: false
 

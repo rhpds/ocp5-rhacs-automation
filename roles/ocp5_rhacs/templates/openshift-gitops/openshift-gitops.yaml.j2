@@ -16,6 +16,12 @@ spec:
         memory: "{{ ocp5_rhacs_openshift_gitops_controller_requests_memory }}"
     appSync: "{{ ocp5_rhacs_openshift_gitops_controller_app_sync }}"
 {% endif %}
+  extraConfig:
+    timeout.reconciliation: "{{ ocp5_rhacs_openshift_gitops_timeout_reconciliation }}"
+{% if ocp5_rhacs_openshift_gitops_resource_customizations | length > 0 %}
+    resource.customizations: |
+      {{ ocp5_rhacs_openshift_gitops_resource_customizations | regex_replace("\n(?!$)", "\n      ") }}
+{% endif %}
   repo:
 {% if ocp5_rhacs_openshift_gitops_repo_update | default(false) | bool %}
     resources:
@@ -41,11 +47,6 @@ spec:
         insecureEdgeTerminationPolicy: Redirect
     insecure: true
 {%   endif %}
-{% endif %}
-{% if ocp5_rhacs_openshift_gitops_resource_customizations | length > 0 %}
-  extraConfig:
-    resource.customizations: |
-      {{ ocp5_rhacs_openshift_gitops_resource_customizations | regex_replace("\n(?!$)", "\n      ") }}
 {% endif %}
 {% if ocp5_rhacs_openshift_gitops_ignore_differences | length > 0 %}
   resourceIgnoreDifferences:
