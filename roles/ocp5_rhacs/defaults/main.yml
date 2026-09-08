@@ -125,8 +125,8 @@ ocp5_rhacs_console_cert_target_secret: console-serving-cert
 # Red Hat Advanced Cluster Security
 # ------------------------------------------------
 
-ocp5_rhacs_acs_application_name: acs
-ocp5_rhacs_acs_namespace: acs
+ocp5_rhacs_acs_application_name: rhacs-operator
+ocp5_rhacs_acs_namespace: rhacs-operator
 ocp5_rhacs_acs_clustername: local-cluster
 ocp5_rhacs_acs_adminpassword: "{{ common_password }}"
 
