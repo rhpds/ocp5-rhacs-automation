@@ -1,14 +1,29 @@
 ---
-
-- name: Get OpenShift Ingress Domain
-  kubernetes.core.k8s_info:
-    api_version: config.openshift.io/v1
-    kind: Ingress
-    name: cluster
-  register: r_openshift_ingress
+# Publish fully resolved attributes for Showroom. Nested {attr} values in
+# antora.yml are treated as literals, so composed URLs must be set here.
+# Hostname prefixes come from defaults/main.yml and are passed to GitOps.
 
 - name: Set user info for showroom
   agnosticd.core.agnosticd_user_info:
     data:
       common_password: "{{ common_password }}"
-      openshift_cluster_ingress_domain: "{{ r_openshift_ingress.resources[0].spec.domain }}"
+      workshop_user_suffix: "{{ ocp5_rhacs_workshop_user_suffix }}"
+      payment_gateway_namespace: "payment-gateway-{{ ocp5_rhacs_workshop_user_suffix }}"
+      vulnerable_workload_namespace: "vulnerable-workload-{{ ocp5_rhacs_workshop_user_suffix }}"
+      openshift_cluster_ingress_domain: "{{ r_openshift_subdomain }}"
+      openshift_console_url: "https://{{ r_console_route.resources[0].spec.host }}"
+      web_console_url: "https://{{ r_console_route.resources[0].spec.host }}"
+      openshift_admin_user: "{{ openshift_cluster_admin_username | default('admin') }}"
+      openshift_admin_password: "{{ openshift_cluster_admin_password | default(common_password) }}"
+      acs_host: "{{ ocp5_rhacs_acs_route_host }}.{{ r_openshift_subdomain }}"
+      acs_route: "https://{{ ocp5_rhacs_acs_route_host }}.{{ r_openshift_subdomain }}"
+      acs_portal_username: "{{ ocp5_rhacs_acs_portal_username }}"
+      acs_portal_password: "{{ ocp5_rhacs_acs_adminpassword }}"
+      openshift_gitops_url: "https://{{ ocp5_rhacs_gitops_route_host }}.{{ r_openshift_subdomain }}"
+      openshift_gitops_user: "admin"
+      openshift_gitops_password: "{{ openshift_gitops_admin_password | default('') }}"
+      quay_console_url: "https://{{ ocp5_rhacs_quay_route_host }}.{{ r_openshift_subdomain }}"
+      quay_url: "{{ ocp5_rhacs_quay_route_host }}.{{ r_openshift_subdomain }}"
+      quay_admin_username: "{{ ocp5_rhacs_quay_admin_username }}"
+      quay_admin_password: "{{ common_password }}"
+      quay_user: "{{ ocp5_rhacs_quay_admin_username }}"

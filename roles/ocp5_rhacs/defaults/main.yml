@@ -112,10 +112,6 @@ ocp5_rhacs_catalog_source_image: quay.io/rhpds/olm_snapshot_redhat_catalog
 ocp5_rhacs_catalog_source_tag: v4.22_2026_08_03
 
 # ------------------------------------------------
-# Red Hat Advanced Cluster Security
-# ------------------------------------------------
-
-# ------------------------------------------------
 # OCP 5.0 console cert workaround
 # ------------------------------------------------
 ocp5_rhacs_console_cert_workaround: true
@@ -131,6 +127,20 @@ ocp5_rhacs_acs_application_name: rhacs-operator
 ocp5_rhacs_acs_namespace: rhacs-operator
 ocp5_rhacs_acs_clustername: local-cluster
 ocp5_rhacs_acs_adminpassword: "{{ common_password }}"
+
+# ------------------------------------------------
+# Showroom UserInfo / GitOps route contract
+# Hostname prefixes must match GitOps (app-of-apps values + child charts)
+# and Showroom ui-config.yml. Automation publishes fully resolved URLs;
+# Antora does not interpolate {other_attr} inside antora.yml.
+# ------------------------------------------------
+
+ocp5_rhacs_acs_route_host: central-reencrypt-stackrox
+ocp5_rhacs_acs_portal_username: admin
+ocp5_rhacs_quay_route_host: quay
+ocp5_rhacs_quay_admin_username: admin
+ocp5_rhacs_gitops_route_host: openshift-gitops-server-openshift-gitops
+ocp5_rhacs_workshop_user_suffix: "1"
 
 # ------------------------------------------------
 # LLM Configuration
