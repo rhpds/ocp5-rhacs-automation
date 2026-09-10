@@ -141,6 +141,14 @@ ocp5_rhacs_quay_route_host: quay
 ocp5_rhacs_quay_admin_username: admin
 ocp5_rhacs_gitops_route_host: openshift-gitops-server-openshift-gitops
 ocp5_rhacs_workshop_user_suffix: "1"
+# TSSC Keycloak cannot use sso.<domain> — RHDP RHBK already claims that host.
+ocp5_rhacs_keycloak_route_host: sso-tpa
+ocp5_rhacs_keycloak_admin_username: admin
+ocp5_rhacs_keycloak_username: tpa-user
+ocp5_rhacs_gitea_route_host: gitea
+ocp5_rhacs_gitea_username: student
+ocp5_rhacs_rhtpa_route_host: server-trusted-profile-analyzer
+ocp5_rhacs_rhdh_route_host: backstage-developer-hub-rhdh
 
 # ------------------------------------------------
 # LLM Configuration
