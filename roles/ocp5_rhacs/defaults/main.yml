@@ -137,7 +137,7 @@ ocp5_rhacs_acs_adminpassword: "{{ common_password }}"
 
 ocp5_rhacs_acs_route_host: central-reencrypt-stackrox
 ocp5_rhacs_acs_portal_username: admin
-ocp5_rhacs_quay_route_host: quay
+ocp5_rhacs_quay_route_host: registry-quay-quay
 ocp5_rhacs_quay_admin_username: admin
 ocp5_rhacs_gitops_route_host: openshift-gitops-server-openshift-gitops
 ocp5_rhacs_workshop_user_suffix: "1"
