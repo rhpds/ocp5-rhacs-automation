@@ -6,7 +6,7 @@ readme: README.md
 authors:
   - Red Hat Demo Platform <rhpds@redhat.com>
 
-description: Ansible collection for deploying the OpenShift 5 Early Access hosted environment
+description: Ansible collection for deploying the OpenShift Security Roadshow hosted environment
 
 license:
   - GPL-2.0-or-later
@@ -15,7 +15,8 @@ tags:
   - openshift
   - workshop
   - ocp5
-  - early_access
+  - roadshow
+  - rhacs
 
 dependencies: {}
 

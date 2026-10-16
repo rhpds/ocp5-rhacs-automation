@@ -1,16 +1,22 @@
-# OCP5 Early Access Automation
+# OpenShift Security Roadshow automation
 
-Ansible collection for provisioning the OpenShift 5 Early Access hosted environment
-on the Red Hat Demo Platform (RHDP).
+Ansible collection that provisions the OpenShift Security Roadshow on the Red Hat Demo Platform (RHDP).
 
-## Role: ocp5_ea
+## Role: ocp5_rhacs
 
-Installs OpenShift GitOps, deploys an app-of-apps ArgoCD Application pointing
-to the [ocp5-ea-gitops](https://github.com/rhpds/ocp5-ea-gitops) Helm chart repo,
-and publishes user data for Showroom.
+On `ACTION: provision` the role:
+
+- Installs OpenShift GitOps
+- Deploys the app-of-apps Argo CD Application from [ocp5-rhacs-gitops](https://github.com/rhpds/ocp5-rhacs-gitops)
+- Installs the `oc-agentic` and FastMCP CLIs on the bastion
+- Publishes Showroom user data for the OpenShift console, RHACS, Quay, GitOps, and the Lightwell TSSC routes
+
+The GitOps chart stands up the roadshow workload: RHACS, the virtual machine used by the ACS labs, Quay, the demo applications, roadshow prerequisites, the ACS and OpenShift MCP servers, OpenShift Lightspeed, and the Lightwell TSSC workshop stack.
+
+On `ACTION: destroy` the role removes the app-of-apps Application.
 
 ### Usage
 
 Set `ACTION: provision` to deploy or `ACTION: destroy` to tear down.
 
-See `roles/ocp5_ea/defaults/main.yml` for all configurable variables.
+Configurable variables are in `roles/ocp5_rhacs/defaults/main.yml`.
