@@ -4,6 +4,14 @@
 # ------------------------------------------------
 
 ocp5_rhacs_wait_for_apps_ignore_errors: false
+# Bound the provisioning wait and recovery; do not permanently retry broken Git.
+ocp5_rhacs_wait_for_apps_timeout: 3600
+ocp5_rhacs_wait_for_apps_attempts: 60
+ocp5_rhacs_wait_for_apps_delay: 60
+ocp5_rhacs_wait_for_apps_ready_samples: 2
+ocp5_rhacs_bootstrap_recovery_enabled: true
+ocp5_rhacs_bootstrap_recovery_limit: 3
+ocp5_rhacs_bootstrap_recovery_cooldown_polls: 5
 
 ocp5_rhacs_gitops_repo: https://github.com/rhpds/ocp5-rhacs-gitops.git
 ocp5_rhacs_gitops_repo_tag: main

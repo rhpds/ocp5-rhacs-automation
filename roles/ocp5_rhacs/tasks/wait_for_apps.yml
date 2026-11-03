@@ -1,75 +1,53 @@
 ---
+- name: Validate bootstrap polling settings
+  ansible.builtin.assert:
+    that:
+      - ocp5_rhacs_wait_for_apps_timeout | int > 0
+      - ocp5_rhacs_wait_for_apps_attempts | int > 0
+      - ocp5_rhacs_wait_for_apps_delay | int >= 0
+      - ocp5_rhacs_wait_for_apps_ready_samples | int > 0
+      - ocp5_rhacs_bootstrap_recovery_limit | int >= 0
+      - ocp5_rhacs_bootstrap_recovery_cooldown_polls | int >= 1
 
-- name: Wait for child ArgoCD Applications to be created by app-of-apps
-  kubernetes.core.k8s_info:
-    api_version: argoproj.io/v1alpha1
-    kind: Application
-    namespace: openshift-gitops
-    label_selectors:
-      - app.kubernetes.io/part-of=app-of-apps
-  register: r_argocd_apps
-  retries: 30
-  delay: 10
-  until:
-    - r_argocd_apps is not failed
-    - r_argocd_apps.resources | length > 0
-
-- name: Build list of child Application names
+- name: Initialize bounded ArgoCD bootstrap recovery
   ansible.builtin.set_fact:
-    r_child_app_names: >-
-      {{ r_argocd_apps.resources
-        | map(attribute='metadata.name')
-        | list }}
+    r_argocd_bootstrap_ready: false
+    r_bootstrap_deadline: >-
+      {{ lookup('pipe', 'date +%s') | int + ocp5_rhacs_wait_for_apps_timeout | int }}
+    r_bootstrap_recoveries: {}
+    r_bootstrap_ready_samples: 0
+    r_bootstrap_platform_samples: 0
+    r_bootstrap_state:
+      pending: []
+      parent_ready: false
 
-- name: Print discovered child Applications
-  ansible.builtin.debug:
-    msg: "Found {{ r_child_app_names | length }} child Applications: {{ r_child_app_names }}"
+- name: Wait for child ArgoCD Applications with bounded recovery
+  ansible.builtin.include_tasks: wait_for_apps_poll.yml
+  loop: "{{ range(0, ocp5_rhacs_wait_for_apps_attempts | int) | list }}"
+  loop_control:
+    loop_var: r_bootstrap_poll
+    label: "poll {{ r_bootstrap_poll | int + 1 }}"
+  when:
+    - not r_argocd_bootstrap_ready | bool
+    - lookup('pipe', 'date +%s') | int < r_bootstrap_deadline | int
 
-- name: Wait for child ArgoCD Applications to be Synced and Healthy
-  kubernetes.core.k8s_info:
-    api_version: argoproj.io/v1alpha1
-    kind: Application
-    namespace: openshift-gitops
-    label_selectors:
-      - app.kubernetes.io/part-of=app-of-apps
-  register: r_argocd_apps_status
-  retries: 60
-  delay: 60
-  until:
-    - r_argocd_apps_status.resources is defined
-    - r_argocd_apps_status.resources
-      | selectattr('status', 'defined')
-      | selectattr('status.sync', 'defined')
-      | selectattr('status.health', 'defined')
-      | length == r_argocd_apps_status.resources | length
-    - r_argocd_apps_status.resources
-      | selectattr('status', 'defined')
-      | rejectattr('status.sync.status', 'equalto', 'Synced')
-      | list
-      | length == 0
-    - r_argocd_apps_status.resources
-      | selectattr('status', 'defined')
-      | rejectattr('status.health.status', 'equalto', 'Healthy')
-      | list
-      | length == 0
+- name: Require all child Applications and parent to finish Synced and Healthy
+  ansible.builtin.assert:
+    that:
+      - r_argocd_bootstrap_ready | bool
+    fail_msg: >-
+      ArgoCD bootstrap did not converge within {{ ocp5_rhacs_wait_for_apps_attempts }} polls.
+      Parent ready: {{ r_bootstrap_state.parent_ready }}.
+      Pending applications: {{ r_bootstrap_state.pending }}.
+      Recovery attempts: {{ r_bootstrap_recoveries }}.
+    success_msg: All watched Applications and app-of-apps finished Synced and Healthy.
+  register: r_bootstrap_assertion
   ignore_errors: "{{ ocp5_rhacs_wait_for_apps_ignore_errors }}"
 
-- name: Report unhealthy Applications
-  when: r_argocd_apps_status is failed
-  block:
-    - name: Collect unhealthy Application names
-      ansible.builtin.set_fact:
-        r_unhealthy_apps: >-
-          {{ r_argocd_apps_status.resources
-            | default([])
-            | selectattr('status', 'defined')
-            | rejectattr('status.health.status', 'equalto', 'Healthy')
-            | map(attribute='metadata.name')
-            | list }}
-
-    - name: Warn about unhealthy Applications
-      ansible.builtin.debug:
-        msg: >-
-          WARNING: Timed out waiting for all Applications to be Synced and Healthy.
-          Unhealthy apps: {{ r_unhealthy_apps | default('unknown') }}.
-          Deployment will continue — these apps may still converge.
+- name: Warn when bootstrap failure is explicitly ignored
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: ArgoCD readiness failed and was explicitly ignored by configuration.
+      Provisioning continues, but this is NOT a successful GitOps validation.
+      Pending applications: {{ r_bootstrap_state.pending }}.
+  when: r_bootstrap_assertion is failed
