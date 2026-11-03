@@ -1,0 +1,125 @@
+---
+- name: Read bootstrap state without logging credentials in Application specs
+  kubernetes.core.k8s_info:
+    api_version: "{{ item.api_version }}"
+    kind: "{{ item.kind }}"
+    namespace: "{{ item.namespace | default(omit) }}"
+    name: "{{ item.name | default(omit) }}"
+    label_selectors: "{{ item.labels | default(omit) }}"
+  loop:
+    - api_version: argoproj.io/v1alpha1
+      kind: Application
+      namespace: openshift-gitops
+      labels:
+        - app.kubernetes.io/part-of=app-of-apps
+    - api_version: argoproj.io/v1alpha1
+      kind: Application
+      namespace: openshift-gitops
+      name: app-of-apps
+    - api_version: machineconfiguration.openshift.io/v1
+      kind: MachineConfigPool
+    - api_version: v1
+      kind: Pod
+      namespace: openshift-gitops
+  register: r_bootstrap_reads
+  failed_when: false
+  no_log: true
+
+- name: Prepare bootstrap snapshot
+  ansible.builtin.set_fact:
+    r_bootstrap_snapshot:
+      apps: "{{ r_bootstrap_reads.results[0].resources | default([]) }}"
+      parent: "{{ r_bootstrap_reads.results[1].resources | default([]) | first | default({}) }}"
+      pools: "{{ r_bootstrap_reads.results[2].resources | default([]) }}"
+      pods: "{{ r_bootstrap_reads.results[3].resources | default([]) }}"
+      api_ok: "{{ r_bootstrap_reads.results | selectattr('resources', 'defined') | list | length == 4 }}"
+      counts: "{{ r_bootstrap_recoveries }}"
+      poll: "{{ r_bootstrap_poll }}"
+      max_recovery: >-
+        {{ ocp5_rhacs_bootstrap_recovery_limit | int
+           if ocp5_rhacs_bootstrap_recovery_enabled | bool else 0 }}
+      cooldown: "{{ ocp5_rhacs_bootstrap_recovery_cooldown_polls }}"
+      platform_stable: "{{ r_bootstrap_platform_samples | int >= 2 }}"
+  no_log: true
+
+- name: Evaluate bootstrap readiness
+  ansible.builtin.set_fact:
+    r_bootstrap_state: "{{ r_bootstrap_snapshot | rhdp.workshop.ocp5_rhacs_bootstrap_state }}"
+  no_log: true
+
+- name: Track consecutive ready samples
+  ansible.builtin.set_fact:
+    r_bootstrap_platform_samples: >-
+      {{ r_bootstrap_platform_samples | int + 1 if r_bootstrap_state.platform_ready else 0 }}
+    r_bootstrap_ready_samples: >-
+      {{ r_bootstrap_ready_samples | int + 1 if r_bootstrap_state.ready else 0 }}
+
+- name: Retry idle failed or degraded Applications at their resolved revision
+  kubernetes.core.k8s:
+    state: present
+    merge_type:
+      - merge
+    definition:
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: "{{ item.name }}"
+        namespace: openshift-gitops
+        # Reject a stale read instead of overwriting a newly started operation.
+        resourceVersion: "{{ item.resource_version }}"
+      operation:
+        initiatedBy:
+          username: aap-bootstrap-recovery
+        retry:
+          limit: 0
+        sync:
+          revision: "{{ item.revision | default(omit) }}"
+          revisions: "{{ item.revisions | default(omit) }}"
+          syncStrategy:
+            hook: {}
+          syncOptions:
+            - CreateNamespace=true
+            - RespectIgnoreDifferences=true
+            - SkipDryRunOnMissingResource=true
+  loop: "{{ r_bootstrap_state.recover }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: r_bootstrap_recovery_apply
+  failed_when: false
+  no_log: true
+
+- name: Count only accepted recovery operations
+  ansible.builtin.set_fact:
+    r_bootstrap_recoveries: >-
+      {{ r_bootstrap_recoveries | combine({item.item.name: {
+           'count': (r_bootstrap_recoveries.get(item.item.name, {}).get('count', 0) | int) + 1,
+           'last_poll': r_bootstrap_poll | int}}) }}
+  loop: "{{ r_bootstrap_recovery_apply.results | default([]) }}"
+  when:
+    - item.result is defined
+    - item.result.kind | default('') == 'Application'
+  no_log: true
+
+- name: Set final bootstrap readiness
+  ansible.builtin.set_fact:
+    r_argocd_bootstrap_ready: >-
+      {{ r_bootstrap_state.ready and
+         r_bootstrap_ready_samples | int >= ocp5_rhacs_wait_for_apps_ready_samples | int }}
+
+- name: Report bootstrap progress without exposing resource specs
+  ansible.builtin.debug:
+    msg:
+      poll: "{{ r_bootstrap_poll | int + 1 }}"
+      ready: "{{ r_argocd_bootstrap_ready }}"
+      parent_ready: "{{ r_bootstrap_state.parent_ready }}"
+      pending: "{{ r_bootstrap_state.pending }}"
+      recovery_attempts: "{{ r_bootstrap_recoveries }}"
+
+- name: Pause before the next bootstrap check
+  ansible.builtin.pause:
+    seconds: >-
+      {{ [ocp5_rhacs_wait_for_apps_delay | int,
+          [0, (r_bootstrap_deadline | int) - (lookup('pipe', 'date +%s') | int)] | max] | min }}
+  when:
+    - not r_argocd_bootstrap_ready | bool
+    - r_bootstrap_poll | int + 1 < ocp5_rhacs_wait_for_apps_attempts | int
